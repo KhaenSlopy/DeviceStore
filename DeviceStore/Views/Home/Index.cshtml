@@ -1,0 +1,685 @@
+﻿@{
+	ViewData["Title"] = "Home Page";
+}
+
+<style>
+	.card-container {
+		display: flex;
+		justify-content: space-between;
+		gap: 20px;
+	}
+
+	.card {
+		width: 48%;
+		border-radius: 10px;
+		padding: 20px;
+		color: white;
+		box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	.cardDevice {
+		width: 40%;
+		hight: 20%;
+		border-radius: 10px;
+		padding: 20px;
+		color: white;
+		box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	.card-blue {
+		background-color: #007bff;
+	}
+
+	.card-yellow {
+		background-color: #ffc107;
+	}
+
+	.card-green {
+		background-color: forestgreen;
+	}
+
+	.card-plink {
+		background-color: deeppink;
+	}
+
+	.card-body {
+		padding: 10px;
+	}
+
+	.card-title {
+		font-size: 1.25rem;
+		font-weight: bold;
+	}
+
+	p {
+		font-size: 1rem;
+		margin: 0;
+	}
+
+	.row {
+		margin-bottom: 10px;
+	}
+
+	.text-right {
+		text-align: right;
+	}
+
+
+	.divider {
+		border: none;
+		border-top: 2px solid #000;
+		margin: 20px 0;
+		position: relative;
+	}
+
+
+		.divider:before {
+			content: attr(data-label);
+			position: absolute;
+			top: -12px;
+			left: 50%;
+			transform: translateX(-50%);
+			background: #fff;
+			padding: 0 10px;
+			font-size: 16px;
+			font-weight: bold;
+			color: #333;
+		}
+
+	.section {
+		padding: 20px 0;
+	}
+
+	/* กำหนดขนาดของหัวข้อ */
+	h2 {
+		font-size: 24px;
+		font-weight: bold;
+		margin-bottom: 10px;
+	}
+
+	.menu-container {
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		background-color: #f0f0f0;
+		padding: 20px;
+		flex-wrap: wrap;
+	}
+
+	.menu-item {
+		text-align: center;
+		margin: 10px;
+	}
+
+	.menu-box {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 80px;
+		height: 80px;
+		background-color: #007bff;
+		color: white;
+		font-size: 36px;
+		font-weight: bold;
+		border-radius: 10px;
+		margin-bottom: 10px;
+	}
+
+	.menu-item {
+		padding: 20px;
+		text-align: center;
+		border-radius: 8px;
+		color: white;
+	}
+
+	.menu-icon {
+		font-size: 2rem;
+		font-weight: bold;
+		margin-bottom: 10px;
+	}
+
+	.menu-name {
+		font-size: 1rem;
+		color: black;
+		text-align: center;
+	}
+
+	.bg-primary {
+		background-color: #007bff;
+	}
+
+	.bg-warning {
+		background-color: #ffc107;
+	}
+
+	.bg-success {
+		background-color: #28a745;
+	}
+
+	.bg-secondary {
+		background-color: #6c757d;
+	}
+
+	/* ทำให้ modal เต็มจอ */
+	.modal-fullscreen {
+		max-width: 100% !important;
+		height: 100% !important;
+		margin: 0;
+		padding: 0;
+	}
+
+	.modal-content {
+		height: 100%;
+		overflow-y: auto;
+	}
+
+	.modal-header .close {
+		font-size: 2rem;
+		margin-top: -10px;
+		margin-right: -10px;
+	}
+
+
+	.modal-dialog {
+		max-width: 95%;
+		width: 100%;
+		height: 80%;
+	}
+
+	.modal-body {
+		max-height: 70vh;
+		overflow-y: auto;
+	}
+
+</style>
+
+
+<div class="section">
+	<h2>Overview</h2>
+	<div class="card-container">
+		<div class="card card-blue">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-6">
+						<h5 class="card-title">Devices</h5>
+					</div>
+					<div class="col-6 text-right">
+						<h6 class="">All</h6>
+						<h5 id="dtotal" class="card-title">0</h5>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6">
+						<p>Status</p>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-6 d-flex align-items-center">
+						<p class="mb-0">In Store:</p>
+						<p id="dinstore" class="mb-0 ms-2">0</p>
+					</div>
+					<div class="col-6 d-flex align-items-center text-end">
+						<p class="mb-0">Damaged:</p>
+						<p id="ddemaged" class="mb-0 ms-2">0</p>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-6 d-flex align-items-center">
+						<p class="mb-0">In Use:</p>
+						<p id="dinuse" class="mb-0 ms-2">0</p>
+					</div>
+					<div class="col-6 d-flex align-items-center text-end">
+						<p class="mb-0">Lost:</p>
+						<p id="dlost" class="mb-0 ms-2">0</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="card card-yellow">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-6">
+						<h5 class="card-title">Category</h5>
+					</div>
+					<div class="col-6 text-right">
+						<h6>All</h6>
+						<h5 class="card-title" id="totalCategories">0</h5>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6">
+						<p>Status:</p>
+					</div>
+
+				</div>
+				<div class="row">
+					<div class="col-6 d-flex align-items-center">
+						<p class="mb-0">Active:</p>
+						<p id="activeCategories" class="mb-0 ms-2">0</p>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 d-flex align-items-center">
+						<p>Inactive:</p>
+						<p id="inactiveCategories"> 0</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr class="divider" />
+</div>
+
+<div class="section">
+	<h2>Devices Ststus</h2>
+	<div class="card-container">
+		<div class="cardDevice bg-primary">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-6">
+						<h5 class="card-title">In Store</h5>
+					</div>
+					<div class="col-6 text-right">
+						<h5 id="instore" class="card-title">0</h5>
+					</div>
+				</div>
+				<div class="row">
+					&nbsp;
+				</div>
+				<div class="row" id="viewInStore">
+					<button class="btn btn-outline-info" onclick="loadDevices('In Store')">view</button>
+				</div>
+
+			</div>
+		</div>
+		<div class="cardDevice card-green">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-6">
+						<h5 class="card-title">In Use</h5>
+					</div>
+					<div class="col-6 text-right">
+						<h5 id="inuse" class="card-title">0</h5>
+					</div>
+				</div>
+				<div class="row">
+					&nbsp;
+				</div>
+				<div class="row" id="viewInUse">
+					<button class="btn btn-outline-info" onclick="loadDevices('In Use')">view</button>
+
+				</div>
+			</div>
+		</div>
+
+		<div class="cardDevice card-plink">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-6">
+						<h5 class="card-title">Damaged</h5>
+					</div>
+					<div class="col-6 text-right">
+						<h5 id="demaged" class="card-title">0</h5>
+					</div>
+				</div>
+				<div class="row">
+					&nbsp;
+				</div>
+				<div class="row" id="viewDamaged">
+					<button class="btn btn-outline-info" onclick="loadDevices('Damaged')">view</button>
+
+				</div>
+			</div>
+		</div>
+		<div class="cardDevice card-yellow">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-6">
+						<h5 class="card-title">Lost</h5>
+					</div>
+					<div class="col-6 text-right">
+						<h5 id="lost" class="card-title">0</h5>
+					</div>
+				</div>
+				<div class="row">
+					&nbsp;
+				</div>
+				<div class="row" id="viewLost">
+					<button class="btn btn-outline-info" onclick="loadDevices('Lost')">view</button>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<hr class="divider" />
+</div>
+
+<div class="section">
+	<h2>Categorys</h2>
+	<div class="menu-container">
+		<div class="row" id="menuContainer">
+		</div>
+	</div>
+</div>
+
+
+<div class="modal" id="deviceModal" tabindex="-1" role="dialog" aria-labelledby="deviceModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-fullscreen" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="deviceModalLabel">Device List</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table id="deviceTable" class="table table-striped">
+					<thead>
+						<tr>
+							<th>DeviceID</th>
+							<th>Type</th>
+							<th>Name</th>
+							<th>Brand</th>
+							<th>Model</th>
+							<th>Purchase Date</th>
+							<th>WarrantyExpiry</th>
+							<th>Status</th>
+
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl">
+
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="categoryModalLabel">Device List</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<table id="deviceTabletype" class="table table-striped">
+					<thead>
+						<tr>
+							<th>DeviceID</th>
+							<th>Type</th>
+							<th>Name</th>
+							<th>Brand</th>
+							<th>Model</th>
+							<th>Purchase Date</th>
+							<th>WarrantyExpiry</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+<script>
+		$(document).ready(function () {
+			$('#deviceTable').DataTable({
+			"paging": true,
+			"searching": true,
+			"ordering": true,
+			"info": true,
+			"autoWidth": false,
+			"columnDefs": [
+				{
+					"targets": 3,
+					"orderable": false
+				}
+			]
+		});
+
+		$.ajax({
+			url: "/Home/GetCategoryCounts",
+			type: "GET",
+			success: function (response) {
+				if (response.success) {
+					$("#totalCategories").text(response.total);
+					$("#activeCategories").text(response.active);
+					$("#inactiveCategories").text(response.inactive);
+				} else {
+					console.error("Error:", response.message);
+				}
+			},
+			error: function (xhr, status, error) {
+				console.error("AJAX Error:", error);
+			}
+		});
+			 $.ajax({
+				url: "/Home/GetDeviceCount",
+				type: "GET",
+				success: function (response) {
+					console.log(response.damaged);
+					if (response.success) {
+							if (response.instore > 0) {
+			$("#viewInStore").show();
+		} else {
+			$("#viewInStore").hide();
+		}
+
+		if (response.damaged > 0) {
+			$("#viewDamaged").show();
+		} else {
+			$("#viewDamaged").hide();
+		}
+
+		if (response.inuse > 0) {
+			$("#viewInUse").show();
+		} else {
+			$("#viewInUse").hide();
+		}
+
+		if (response.lost > 0) {
+			$("#viewLost").show();
+		} else {
+			$("#viewLost").hide();
+		}
+
+
+
+						$("#dtotal").text(response.total);
+						$("#dinstore").text(response.instore);
+						$("#ddemaged").text(response.damaged);
+						$("#dinuse").text(response.inuse);
+						$("#dlost").text(response.lost);
+
+						$("#instore").text(response.instore);
+						$("#demaged").text(response.damaged);
+						$("#inuse").text(response.inuse);
+						$("#lost").text(response.lost);
+					} else {
+						console.error("Error:", response.message);
+					}
+				},
+				error: function (xhr, status, error) {
+					console.error("AJAX Error:", error);
+				}
+			});
+
+
+
+	});
+
+		$(document).ready(function () {
+
+			$("#openModal").click(function () {
+				$("#deviceModal").modal('show');
+			});
+
+
+			$(".close").click(function () {
+				$("#deviceModal").modal('hide');
+			});
+
+			$.ajax({
+				url: '/Home/GetCategories',
+				type: 'GET',
+				dataType: 'json',
+				success: function (data) {
+
+
+					createMenu(data);
+				}
+			});
+
+
+			function createMenu(categories) {
+
+				categories.forEach(function (category) {
+
+					var firstLetter = category.name.charAt(0).toUpperCase();
+					var menuItem = `
+					<div class="col-6 col-md-2 mb-3">
+						<div class="menu-item" onclick="openCategoryModal('${category.typeID}', '${category.name}')">
+							<div class="menu-box">
+								${firstLetter}
+							</div>
+							<div class="menu-name">
+								${category.name}
+							</div>
+						</div>
+					</div>
+					`;
+
+					$('#menuContainer').append(menuItem);
+				});
+			}
+
+
+
+		});
+			function openCategoryModal(categoryId, categoryName) {
+
+
+
+		$('#categoryModalLabel').text('Device List - ' + categoryName);
+
+
+			$.ajax({
+		url: '/Home/GetDevicebyType',
+		method: 'GET',
+		data: {
+			categoryId: categoryId
+		},
+		dataType: "json",
+		success: function(response) {
+
+
+
+			if(response.success && response.devices.length > 0){
+
+				if ($.fn.dataTable.isDataTable('#deviceTable')) {
+					$('#deviceTable').DataTable().clear().destroy();
+				}
+
+
+				$('#deviceTable').DataTable({
+					data: response.devices,
+					columns: [
+						{ data: 'deviceID' },
+						{ data: 'type' },
+						{ data: 'name' },
+						{ data: 'brand' },
+						{ data: 'model' },
+						{ data: 'purchaseDate' },
+						{ data: 'warrantyExpiry' },
+						{ data: 'status' },
+
+					],
+
+					searching: true,
+
+					ordering: true
+				});
+
+
+				$('#deviceModal').modal('show');
+
+			} else {
+
+				Swal.fire({
+					title: 'Warning!',
+					text: 'No devices found for the selected category.',
+					icon: 'warning',
+					confirmButtonText: 'OK'
+				});
+			}
+		},
+		error: function(err) {
+			console.log("Error fetching data:", err);
+			Swal.fire({
+				title: 'Error!',
+				text: 'There was an error fetching the data.',
+				icon: 'error',
+				confirmButtonText: 'OK'
+			});
+		}
+	});
+
+	}
+
+	// ปิด modal
+	$('#categoryModal').on('hidden.bs.modal', function () {
+		// รีเซ็ตข้อมูลใน DataTable เมื่อปิด modal
+		$('#deviceTable').DataTable().clear().destroy();
+	});
+
+
+			function loadDevices(status) {
+			$.ajax({
+				url: '/Home/GetDevicesByStatus',
+				type: 'GET',
+				data: { status: status },
+				success: function(data) {
+					$('#deviceTable').DataTable().clear();
+					$('#deviceTable').DataTable().clear().destroy();
+
+
+					data.forEach(function(device) {
+									console.log(device);
+
+						$('#deviceTable').DataTable().row.add([
+							   device.deviceID,
+								device.type,
+								device.name,
+								device.brand,
+								device.model,
+								device.purchaseDate,
+								device.warrantyExpiry,
+								device.status,
+
+						]).draw();
+					});
+
+
+					$('#deviceModal').modal('show');
+				},
+				error: function(xhr, status, error) {
+					alert("Error: " + error);
+				}
+			});
+		}
+</script>

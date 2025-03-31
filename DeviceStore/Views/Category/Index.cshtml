@@ -1,0 +1,266 @@
+﻿@{
+    ViewData["Title"] = "Category List";
+}
+
+<h2>Category List</h2>
+
+<button class="btn btn-primary" onclick="openModal()">เพิ่มหมวดหมู่</button>
+
+<div id="categoryModal" style="display: none;">
+    <label>ชื่อหมวดหมู่:</label>
+    <input type="text" id="name" class="form-control">
+    <label>รายละเอียด:</label>
+    <input type="text" id="description" class="form-control">
+    <label>สถานะ:</label>
+    <select id="status" class="form-control">
+        <option value="true">Active</option>
+        <option value="false">Inactive</option>
+    </select>
+    <br>
+    <button onclick="addCategory()" class="btn btn-success">บันทึก</button>
+</div>
+<div>&nbsp; <br/></div>
+
+<table id="categoryTable" class="display">
+    <thead>
+        <tr>
+            
+            <th>Name</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+</table>
+
+<div id="categoryEditModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="categoryIds">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="names" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input type="text" id="descriptions" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="statuss" class="form-control">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">Close</button>
+                <button type="button" class="btn btn-primary" onclick="updateCategory()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+       let table;
+       var categoryIdToDelete;
+
+    $(document).ready(function () {
+        table = $('#categoryTable').DataTable({
+            "destroy": true,  // ป้องกัน DataTable ซ้อนกัน
+            "processing": true,
+            "serverSide": false,
+            "ajax": {
+                "url": "/Category/GetCategories", 
+                "type": "GET",
+                "dataType": "json",
+                "beforeSend": function () {
+                    console.log('Loading data from server...');
+                },
+                "dataSrc": "data"
+            },
+            "columns": [
+                { "data": "name" },
+                { "data": "description" },
+                {
+                    "data": "status",
+                    "render": function (data, type, row) {
+                        return data === "true" ? "Active" : "Inactive";
+                    }
+                },
+                 {
+                        "data": null,
+                        "render": function (data,type,row) {
+                            return `
+                                <button class="btn btn-primary btn-sm" onclick="editCategory('${row.typeID}')">Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="confirmDelete('${row.typeID}')">Delete</button>
+                            `;
+                        }
+                    }
+            ]
+        });
+    $('#categoryEditModal .close').click(function() {
+        $('#categoryEditModal').modal('hide');
+    });
+
+    });
+
+    function openModal() {
+        $("#categoryModal").show(); 
+    }
+
+    function addCategory() {
+        let name = $("#name").val();
+        let description = $("#description").val();
+        let status = $("#status").val();
+
+        $.ajax({
+            url: "/Category/AddCategory",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Name: name,
+                Description: description,
+                Status: status
+            }),
+            success: function (res) {
+                Swal.fire("สำเร็จ!", "เพิ่มหมวดหมู่เรียบร้อย!", "success");
+                $("#categoryModal").hide();
+                table.ajax.reload(null, false); 
+            },
+            error: function () {
+                Swal.fire("ผิดพลาด!", "เกิดข้อผิดพลาดในการเพิ่มข้อมูล!", "error");
+            }
+        });
+    }
+
+           function editCategory(id) {
+        var modalElement = document.querySelector('#categoryEditModal');
+        if (modalElement) {
+            
+            $.ajax({
+                url: `/Category/GetCategoryById/${id}`,
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    // console.log('Loading data:', data);  
+                    if (data && data.data) {
+                        // console.log('Category Data:', data.data);  
+                        console.log("Setting typeID:", data.data.typeID);  
+                        $("#categoryIds").val(data.data.typeID); 
+                        // console.log("Setting name:", data.data.name);
+                        $("#names").val(data.data.name);
+                        // console.log("Setting description:", data.data.description);
+                        $("#descriptions").val(data.data.description);
+                        // console.log("Setting status:", data.data.status);
+                        $("#statuss").val(data.data.status);
+
+                        
+                        $("#categoryEditModal").modal("show");
+                    } else {
+                        console.error("Invalid data format");
+                    }
+                },
+                error: function () {
+                    Swal.fire("Error!", "Unable to fetch category details!", "error");
+                }
+            });
+        } else {
+            console.error("Modal element is not found.");
+        }
+    }
+
+
+
+
+        function updateCategory() {
+            let id = $("#categoryIds").val();
+            let name = $("#names").val();
+            let description = $("#descriptions").val();
+            let status = $("#statuss").val();
+
+            $.ajax({
+                url: "/Category/UpdateCategory",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    TypeID: id,
+                    Name: name,
+                    Description: description,
+                    Status: status
+                }),
+                success: function () {
+                    Swal.fire("Success!", "Category updated successfully!", "success");
+                    $("#categoryEditModal").modal("hide");
+                    table.ajax.reload(null, false); 
+                },
+                error: function () {
+                    Swal.fire("Error!", "Failed to update category!", "error");
+                }
+            });
+        }
+
+         function confirmDelete(categoryId){
+             // console.log("categoryId"+categoryId)
+       
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+               
+                deleteCategory(categoryId);
+            }
+        });
+    }
+
+    function deleteCategory(categoryId) {
+        
+        $.ajax({
+            url: `/Category/DeleteCategory/${categoryId}`,
+            type: 'POST',
+            success: function(response) {
+                if(response.success) {
+                    Swal.fire(
+                        'Deleted!',
+                        'Your category has been deleted.',
+                        'success'
+                    );
+                    
+                    location.reload();
+                } else {
+                    Swal.fire(
+                        'Error!',
+                        'There was a problem deleting the category.',
+                        'error'
+                    );
+                }
+            },
+            error: function() {
+                Swal.fire(
+                    'Error!',
+                    'There was a problem with the request.',
+                    'error'
+                );
+            }
+        });
+    }
+
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

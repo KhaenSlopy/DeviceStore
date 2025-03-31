@@ -1,0 +1,333 @@
+﻿@{
+	ViewData["Title"] = "Privacy Policy";
+}
+
+
+<h2>Add Device</h2>
+
+<form id="addDeviceForm">
+
+	<div class="row">
+		
+		<div class="col-md-4 mb-3">
+			<label class="form-label">Device ID</label>
+			<input type="text" id="DeviceID" class="form-control" readonly>
+		</div>
+
+		
+		<div class="col-md-4 mb-3">
+			<label class="form-label">Category</label>
+			<select id="TypeID" name="TypeID" class="form-control">
+				<option value="">Select Category</option>
+			</select>
+		</div>
+
+		<div class="col-md-4 mb-3">
+			<label for="Name">Name</label>
+			<input type="text" class="form-control" id="Name" />
+		</div>
+
+		<div class="col-md-4 mb-3">
+			<label for="Brand">Brand</label>
+			<input type="text" class="form-control" id="Brand" />
+		</div>
+
+		<div class="col-md-4 mb-3">
+			<label for="Model">Model</label>
+			<input type="text" class="form-control" id="Model" />
+		</div>
+
+		<div class="col-md-4 mb-3">
+			<label for="PurchaseDate">Purchase Date</label>
+			<input type="date" class="form-control" id="PurchaseDate" />
+		</div>
+
+		<div class="col-md-4 mb-3">
+			<label for="WarrantyExpiry">Warranty Expiry</label>
+			<input type="checkbox" id="HasWarranty" />
+			<input type="date" class="form-control" id="WarrantyExpiry" style="display:none;" />
+		</div>
+
+		<div class="col-md-4 mb-3">
+			<label for="Status">Status</label>
+			<select id="Status" class="form-control">
+				<option value="In Store">In Store</option>
+				<option value="In Use">In Use</option>
+				<option value="Damaged">Damaged</option>
+				<option value="Lost">Lost</option>
+			</select>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<hr class="divider" />
+<div class="row">
+	<table id="deviceTable" class="display">
+		<thead>
+			<tr>
+
+				<th>DeviceID</th>
+				<th>Type</th>
+				<th>Name</th>
+				<th>Brand</th>
+				<th>Model</th>
+				<th>Purchase Date</th>
+				<th>WarrantyExpiry</th>
+				<th>Status</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			
+		</tbody>
+	</table>
+</div>
+
+<div class="modal fade" id="editDeviceModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Edit Device Information</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="editDeviceForm">
+					<input type="hidden" id="eDeviceID" name="DeviceID">
+
+					<div class="row">
+						<div class="col-md-4">
+							<label>Device Name</label>
+							<input type="text" class="form-control" id="eName" name="Name" required>
+						</div>
+						<div class="col-md-4">
+							<label>Brand</label>
+							<input type="text" class="form-control" id="eBrand" name="Brand">
+						</div>
+						<div class="col-md-4">
+							<label>Model</label>
+							<input type="text" class="form-control" id="eModel" name="Model">
+						</div>
+
+						<div class="col-md-4">
+							<label>Device Type</label>
+							<select class="form-control" id="eTypeID" name="TypeID">
+								<option value="">-- Select Type --</option>
+							</select>
+						</div>
+						<div class="col-md-4">
+							<label>Purchase Date</label>
+							<input type="date" class="form-control" id="ePurchaseDate" name="PurchaseDate">
+						</div>
+						<div class="col-md-4">
+							<label>Warranty Expiry</label>
+							<input type="date" class="form-control" id="eWarrantyExpiry" name="WarrantyExpiry">
+						</div>
+
+						<div class="col-md-4">
+							<label>Status</label>
+							<select class="form-control" id="eStatus" name="Status">
+								<option value="In Store">In Store</option>
+								<option value="In Use">In Use</option>
+								<option value="Damaged">Damaged</option>
+								<option value="Lost">Lost</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-success">Save Changes</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+	$(document).ready(function () {
+
+		   $("#editDeviceForm").submit(function (e) {
+			e.preventDefault();
+			var formData = $(this).serialize();
+	  $.ajax({
+		url: "/Home/DeviceEdit",
+		type: "POST",
+		data: formData,
+		success: function (response) {
+
+			if(response.success){
+				Swal.fire("Success!", "Device information updated successfully", "success");
+
+	loadDeviceData();
+
+		  $("#editDeviceModal").modal("hide");
+			}else{
+				Swal.fire("Error", "Failed to update device information", "error");
+			}
+
+		},
+		error: function () {
+		  Swal.fire("Error", "Failed to update device information", "error");
+		}
+	  });
+	});
+
+
+		var table = $('#deviceTable').DataTable({
+		"paging": true,
+		"searching": true,
+		"ordering": true,
+		"info": true,
+		"lengthChange": false,
+		"pageLength": 5
+	});
+
+	
+	function loadDeviceData() {
+		$.ajax({
+			type: "GET",
+			url: '@Url.Action("GetDeviceData", "Home")', 
+			success: function (response) {
+				table.clear(); 
+				console.log(response);
+				$.each(response, function (index, device,row) {
+					
+
+					table.row.add([
+
+						device.deviceID,
+						device.type,
+						device.name,
+						device.brand,
+						device.model,
+						device.purchaseDate,
+						device.warrantyExpiry,
+						device.status,
+						`<button class="edit-btn" data-id="${device.deviceID}">Edit</button>`
+					]).draw();
+				});
+			},
+			error: function () {
+				Swal.fire('Error', 'An error occurred while loading data.', 'error');
+			}
+		});
+	}
+
+	loadDeviceData();
+
+
+		 $.getJSON("/Home/GetCategories", function (data) {
+			data.forEach(function (category) {
+				$("#TypeID").append(`<option value="${category.typeID}">${category.name}</option>`);
+				$("#eTypeID").append(`<option value="${category.typeID}">${category.name}</option>`);
+			});
+		});
+		 $.get("/Home/GenerateDeviceID", function (data) {
+			$("#DeviceID").val(data);
+		});
+
+		$('#HasWarranty').change(function () {
+			if (this.checked) {
+				$('#WarrantyExpiry').show();
+			} else {
+				$('#WarrantyExpiry').hide();
+			}
+		});
+
+		$.ajax({
+			type: "GET",
+			url: '@Url.Action("GetNewDeviceID", "Home")',
+			success: function (response) {
+				if (response.success) {
+					$('#DeviceID').val(response.deviceID);
+				}
+			}
+		});
+
+		$('#addDeviceForm').submit(function (e) {
+			e.preventDefault();
+
+			var deviceData = {
+				DeviceID: $('#DeviceID').val(),
+				TypeID: $('#TypeID').val(),
+				Name: $('#Name').val(),
+				Brand: $('#Brand').val(),
+				Model: $('#Model').val(),
+				PurchaseDate: $('#PurchaseDate').val(),
+				WarrantyExpiry: $('#HasWarranty').is(':checked') ? $('#WarrantyExpiry').val() : null,
+				Status: $('#Status').val()
+			};
+
+			$.ajax({
+				type: "POST",
+				url: '@Url.Action("AddDevice", "Home")',
+				data: deviceData,
+				success: function (response) {
+					if (response.success) {
+						Swal.fire({
+							title: 'Success!',
+							text: 'Device added successfully!',
+							icon: 'success',
+							confirmButtonText: 'OK'
+						}).then(() => {
+						
+						$('#addDeviceForm')[0].reset();  
+						$('#WarrantyExpiry').hide();  
+						$('#DeviceID').val(''); 
+						$('#HasWarranty').prop('checked', false);  
+					});
+					} else {
+						Swal.fire({
+							title: 'Error!',
+							text: response.message,
+							icon: 'error',
+							confirmButtonText: 'OK'
+						});
+					}
+				},
+				error: function () {
+					Swal.fire({
+						title: 'Error!',
+						text: 'An error occurred while adding the device.',
+						icon: 'error',
+						confirmButtonText: 'OK'
+					});
+				}
+			});
+		});
+
+
+	});
+		$(document).on("click", ".edit-btn", function () {
+	  let deviceID = $(this).data("id");
+	  console.log("Selected DeviceID:", deviceID);
+	  editDevice(deviceID);
+	});
+
+	function editDevice(deviceID) {
+	  $.get("/Home/GetEditDevice/" + deviceID, function (data) {
+		  console.log("Purchase Date:", data.purchaseDate);
+	console.log("Warranty Expiry:", data.warrantyExpiry);
+
+
+	  $("#eDeviceID").val(data.deviceID);
+	  $("#eName").val(data.name);
+	  $("#eBrand").val(data.brand);
+	  $("#eModel").val(data.model);
+	  $("#eTypeID").val(data.typeID);
+		 $("#ePurchaseDate").val(data.purchaseDate);
+	$("#eWarrantyExpiry").val(data.warrantyExpiry);
+
+	  $("#eStatus").val(data.status);
+
+	  $("#editDeviceModal").modal("show");
+	  });
+
+	}
+
+</script>
